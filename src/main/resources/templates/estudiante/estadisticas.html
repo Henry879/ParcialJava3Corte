@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estadísticas - Sistema Saber Pro</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .welcome-text {
+            color: #333;
+            margin: 0;
+            font-size: 2rem;
+            font-weight: 300;
+        }
+        .nav-menu {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .nav-menu a {
+            margin: 0 1rem;
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+        }
+        .nav-menu a:hover {
+            text-decoration: underline;
+        }
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 0;
+            color: #667eea;
+        }
+        .stat-label {
+            color: #666;
+            margin: 0.5rem 0 0 0;
+        }
+        .comparison-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .comparison-text {
+            font-size: 1.5rem;
+            margin: 0;
+        }
+        .percentil-badge {
+            display: inline-block;
+            background: #ffd700;
+            color: black;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-top: 1rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            color: #333;
+        }
+        .mi-puntaje {
+            background-color: #e7f3ff;
+            font-weight: bold;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+        .progress-bar {
+            background: #e9ecef;
+            border-radius: 10px;
+            height: 20px;
+            margin: 0.5rem 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navegación -->
+        <div class="nav-menu">
+            <a href="/dashboard-estudiante">🏠 Dashboard</a>
+            <a href="/estudiante/resultados">📊 Mis Resultados</a>
+            <a href="/estudiante/estadisticas">📈 Estadísticas</a>
+            <a href="/logout">🚪 Cerrar Sesión</a>
+        </div>
+
+        <!-- Header -->
+        <div class="header">
+            <h1 class="welcome-text">Estadísticas del Grupo</h1>
+            <p>Compara tu desempeño de manera anónima con el resto del grupo</p>
+        </div>
+
+        <!-- Mensajes -->
+        <div th:if="${error}" style="background: #f8d7da; color: #721c24; padding: 1rem; border-radius: 8px; margin-bottom: 2rem;">
+            <span th:text="${error}"></span>
+        </div>
+
+        <div th:if="${mensaje}" class="empty-state">
+            <h3>📭 No hay datos para comparar</h3>
+            <p th:text="${mensaje}"></p>
+        </div>
+
+        <!-- Contenido principal cuando hay estadísticas -->
+        <div th:if="${estadisticas != null}">
+            <!-- Tarjetas de estadísticas generales -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" th:text="${estadisticas.totalEstudiantes}"></div>
+                    <div class="stat-label">Estudiantes en el grupo</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" th:text="${estadisticas.miPromedio}"></div>
+                    <div class="stat-label">Mi promedio</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" th:text="${estadisticas.competenciasConDatos.size()}"></div>
+                    <div class="stat-label">Competencias evaluadas</div>
+                </div>
+            </div>
+
+            <!-- Comparativa personal -->
+            <div class="comparison-card">
+                <h3 class="comparison-text">Tu posición en el grupo</h3>
+                <div class="percentil-badge" th:text="${estadisticas.percentil}"></div>
+                <p style="margin-top: 1rem; opacity: 0.9;">
+                    Te encuentras en el <span th:text="${estadisticas.percentil}"></span> del grupo
+                </p>
+            </div>
+
+            <!-- Tabla comparativa por competencia -->
+            <div class="card">
+                <h3>📋 Comparativa por Competencia</h3>
+                <p style="color: #666; margin-bottom: 1rem;">
+                    Compara tu puntaje con los promedios del grupo (datos anónimos)
+                </p>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Competencia</th>
+                            <th>Tu Puntaje</th>
+                            <th>Promedio Grupo</th>
+                            <th>Máximo</th>
+                            <th>Mínimo</th>
+                            <th>Comparación</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="resultado : ${misResultados}">
+                            <td th:text="${resultado.competencia.nombre}"></td>
+                            <td class="mi-puntaje" th:text="${resultado.puntaje} + '/100'"></td>
+                            <td th:text="${estadisticas.promediosCompetencia[resultado.competencia.nombre]} + '/100'"></td>
+                            <td th:text="${estadisticas.maximosCompetencia[resultado.competencia.nombre]} + '/100'"></td>
+                            <td th:text="${estadisticas.minimosCompetencia[resultado.competencia.nombre]} + '/100'"></td>
+                            <td>
+                                <div th:if="${resultado.puntaje > estadisticas.promediosCompetencia[resultado.competencia.nombre]}" 
+                                     style="color: #28a745;">✅ Por encima del promedio</div>
+                                <div th:if="${resultado.puntaje < estadisticas.promediosCompetencia[resultado.competencia.nombre]}" 
+                                     style="color: #dc3545;">❌ Por debajo del promedio</div>
+                                <div th:if="${resultado.puntaje == estadisticas.promediosCompetencia[resultado.competencia.nombre]}" 
+                                     style="color: #ffc107;">⚡ En el promedio</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Información sobre privacidad -->
+            <div class="card" style="background: #f8f9fa;">
+                <h3>🔒 Privacidad de Datos</h3>
+                <p>Estas estadísticas muestran información agregada y anónima del grupo. No se muestran nombres, documentos ni información personal de otros estudiantes.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Animación simple para las barras de progreso
+        document.addEventListener('DOMContentLoaded', function() {
+            const progressBars = document.querySelectorAll('.progress-fill');
+            progressBars.forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 100);
+            });
+        });
+    </script>
+</body>
+</html>

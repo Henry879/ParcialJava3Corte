@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Coordinador</title>
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        .header { background: #007bff; color: white; padding: 1rem; }
+        .menu { margin: 1rem 0; }
+        .menu a { margin-right: 1rem; text-decoration: none; color: #007bff; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Dashboard Coordinador</h1>
+        <p>Bienvenido: <span th:text="${usuario.documento}"></span></p>
+        <a href="/logout" style="color: white;">Cerrar Sesión</a>
+		<a href="/reportes/estudiantes">📊 Reporte Estudiantes</a>
+    </div>
+    
+    <div class="menu">
+        <a href="/estudiantes">Gestionar Estudiantes</a>
+        <a href="/estudiantes/nuevo">Nuevo Estudiante</a>
+		<a href="/resultados/nuevo">Ingresar Resultados</a>
+		<a href="/resultados">Ver Resultados</a>
+    </div>
+    
+    <p>Esta es la página del coordinador. Aquí podrás gestionar estudiantes.</p>
+</body>
+</html>

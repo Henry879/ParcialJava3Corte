@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ingresar Resultados - Sistema Saber Pro</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: bold;
+        }
+        select, input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .alert {
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .beneficio-box {
+            background-color: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 4px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        .nivel-indicator {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            color: white;
+            font-weight: bold;
+            margin-left: 0.5rem;
+        }
+        .nivel-rojo { background-color: #dc3545; }
+        .nivel-amarillo { background-color: #ffc107; color: black; }
+        .nivel-verde { background-color: #28a745; }
+        .nivel-azul { background-color: #007bff; }
+        .menu {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .menu a {
+            margin: 0 1rem;
+            text-decoration: none;
+            color: #007bff;
+        }
+        .menu a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="menu">
+            <a href="/dashboard-coordinador">← Volver al Dashboard</a>
+            <a href="/resultados">Ver Todos los Resultados</a>
+        </div>
+
+        <h1>📊 Ingresar Resultados de Pruebas</h1>
+
+        <!-- Mensajes de éxito/error -->
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+        <!-- Mostrar nivel calculado si existe -->
+        <div th:if="${nivelCalculado}" class="beneficio-box">
+            <h3>✅ Resultado Calculado Automáticamente</h3>
+            <p><strong>Nivel:</strong> 
+                <span th:class="${'nivel-indicator nivel-' + colorNivel}" 
+                      th:text="${'Nivel ' + nivelCalculado}"></span>
+            </p>
+            <p><strong>Beneficios:</strong> <span th:text="${beneficiosCalculados}"></span></p>
+        </div>
+
+        <form method="post" action="/resultados/guardar">
+            <div class="form-group">
+                <label for="estudianteId">Estudiante:</label>
+                <select id="estudianteId" name="estudianteId" required>
+                    <option value="">Seleccionar estudiante...</option>
+                    <option th:each="estudiante : ${estudiantes}" 
+                            th:value="${estudiante.id}"
+                            th:text="${estudiante.nombres + ' ' + estudiante.apellidos + ' - ' + estudiante.numeroDocumento}">
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="competenciaId">Competencia:</label>
+                <select id="competenciaId" name="competenciaId" required>
+                    <option value="">Seleccionar competencia...</option>
+                    <option th:each="competencia : ${competencias}" 
+                            th:value="${competencia.id}"
+                            th:text="${competencia.nombre}">
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="tipoPrueba">Tipo de Prueba:</label>
+                <select id="tipoPrueba" name="tipoPrueba" required>
+                    <option value="">Seleccionar tipo...</option>
+                    <option value="SABER_PRO">Saber PRO (0-300 puntos)</option>
+                    <option value="SABER_TT">Saber T&T (0-200 puntos)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="numeroRegistro">Número de Registro:</label>
+                <input type="text" id="numeroRegistro" name="numeroRegistro" required 
+                       placeholder="Ej: REG-2024-001">
+            </div>
+
+            <div class="form-group">
+                <label for="puntajeGeneral">Puntaje General:</label>
+                <input type="number" id="puntajeGeneral" name="puntajeGeneral" 
+                       step="0.1" min="0" max="300" required
+                       placeholder="Puntaje global (0-300 o 0-200)">
+                <small>Rango: 0-300 (Saber PRO) / 0-200 (Saber T&T)</small>
+            </div>
+
+            <div class="form-group">
+                <label for="puntaje">Puntaje de la Competencia:</label>
+                <input type="number" id="puntaje" name="puntaje" 
+                       step="0.1" min="0" max="100" required
+                       placeholder="Puntaje específico (0-100)">
+            </div>
+
+            <button type="submit">💾 Guardar Resultado</button>
+        </form>
+
+        <!-- Información sobre niveles -->
+        <div style="margin-top: 2rem; padding: 1rem; background: #f8f9fa; border-radius: 4px;">
+            <h3>📋 Información de Niveles y Beneficios</h3>
+            <p><strong>Saber PRO:</strong></p>
+            <ul>
+                <li>Nivel 1: < 180 puntos - Sin beneficios</li>
+                <li>Nivel 2: 180-210 puntos - Exoneración + 4.5</li>
+                <li>Nivel 3: 211-240 puntos - Exoneración + 4.7 + 50% beca</li>
+                <li>Nivel 4: > 241 puntos - Exoneración + 5.0 + 100% beca</li>
+            </ul>
+            <p><strong>Saber T&T:</strong></p>
+            <ul>
+                <li>Nivel 1: < 120 puntos - Sin beneficios</li>
+                <li>Nivel 2: 120-150 puntos - Exoneración + 4.5</li>
+                <li>Nivel 3: 151-170 puntos - Exoneración + 4.7 + 50% beca</li>
+                <li>Nivel 4: > 171 puntos - Exoneración + 5.0 + 100% beca</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Validación dinámica de rangos según tipo de prueba
+        document.getElementById('tipoPrueba').addEventListener('change', function() {
+            const tipoPrueba = this.value;
+            const puntajeGeneral = document.getElementById('puntajeGeneral');
+            
+            if (tipoPrueba === 'SABER_PRO') {
+                puntajeGeneral.max = 300;
+                puntajeGeneral.placeholder = 'Puntaje global (0-300)';
+            } else if (tipoPrueba === 'SABER_TT') {
+                puntajeGeneral.max = 200;
+                puntajeGeneral.placeholder = 'Puntaje global (0-200)';
+            }
+        });
+    </script>
+</body>
+</html>

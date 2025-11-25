@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Resultados - Sistema Saber Pro</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .nav-menu {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .nav-menu a {
+            margin: 0 1rem;
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+        }
+        .puntaje-principal {
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+        .puntaje-numero {
+            font-size: 3rem;
+            font-weight: bold;
+            margin: 0;
+        }
+        .nivel-indicator {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            color: white;
+            font-weight: bold;
+            margin-top: 1rem;
+        }
+        .nivel-1 { background-color: #dc3545; }
+        .nivel-2 { background-color: #ffc107; color: black; }
+        .nivel-3 { background-color: #28a745; }
+        .nivel-4 { background-color: #007bff; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navegación -->
+        <div class="nav-menu">
+            <a href="/dashboard-estudiante">🏠 Dashboard</a>
+            <a href="/estudiante/resultados">📊 Mis Resultados</a>
+            <a href="/logout">🚪 Cerrar Sesión</a>
+        </div>
+
+        <h1>Mis Resultados Saber Pro</h1>
+
+        <!-- Mensajes de error -->
+        <div th:if="${error}" class="error-message" th:text="${error}"></div>
+
+        <!-- Sin resultados -->
+        <div th:if="${mensaje}" class="empty-state">
+            <h3>📭 Aún no hay resultados</h3>
+            <p th:text="${mensaje}"></p>
+        </div>
+
+        <!-- Con resultados -->
+        <div th:if="${resultados != null and !resultados.empty}">
+            <!-- Puntaje Principal -->
+            <div class="puntaje-principal">
+                <div class="puntaje-numero" th:text="${puntajeGeneral}"></div>
+                <div>Puntaje General</div>
+                <div class="nivel-indicator" th:classappend="${'nivel-' + nivelGeneral}" 
+                     th:text="${'Nivel ' + nivelGeneral}"></div>
+                <div style="margin-top: 1rem;">
+                    <small th:text="${tipoPrueba}"></small>
+                </div>
+            </div>
+
+            <!-- Tabla de Resultados -->
+            <h3>Resultados por Competencia</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Competencia</th>
+                        <th>Puntaje</th>
+                        <th>Nivel</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="resultado : ${resultados}">
+                        <td th:text="${resultado.competencia.nombre}"></td>
+                        <td th:text="${resultado.puntaje} + '/100'"></td>
+                        <td>
+                            <span th:classappend="${'nivel-indicator nivel-' + resultado.nivel}" 
+                                  th:text="${'Nivel ' + resultado.nivel}"></span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

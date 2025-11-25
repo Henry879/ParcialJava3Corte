@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte de Estudiantes - Sistema Saber Pro</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .nav-menu {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .nav-menu a {
+            margin: 0 1rem;
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+        }
+        .filtros {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        .filtro-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .filtro-btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid #007bff;
+            background: white;
+            color: #007bff;
+            border-radius: 20px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .filtro-btn:hover, .filtro-btn.active {
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+            border-left: 4px solid #007bff;
+        }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 0;
+            color: #333;
+        }
+        .stat-label {
+            color: #666;
+            margin: 0.5rem 0 0 0;
+            font-size: 0.9rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            color: #333;
+            position: sticky;
+            top: 0;
+        }
+        .nivel-indicator {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            color: white;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+        .nivel-1 { background-color: #dc3545; }
+        .nivel-2 { background-color: #ffc107; color: black; }
+        .nivel-3 { background-color: #28a745; }
+        .nivel-4 { background-color: #007bff; }
+        .sin-resultados { background-color: #6c757d; }
+        .alerta-bajo {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+        .sin-datos {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+            font-style: italic;
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            background: #e9ecef;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navegación -->
+        <div class="nav-menu">
+            <a href="/dashboard-coordinador">🏠 Dashboard</a>
+            <a href="/resultados/nuevo">➕ Ingresar Resultados</a>
+            <a href="/resultados">📋 Ver Resultados</a>
+            <a href="/reportes/estudiantes">📊 Reporte Estudiantes</a>
+            <a href="/logout">🚪 Cerrar Sesión</a>
+        </div>
+
+        <h1>📊 Reporte General de Estudiantes</h1>
+
+        <!-- Filtros -->
+        <div class="filtros">
+            <h3>🔍 Filtros por Puntaje</h3>
+            <div class="filtro-group">
+                <a th:href="@{/reportes/estudiantes}" 
+                   th:classappend="${filtroActual == 'todos'} ? 'filtro-btn active' : 'filtro-btn'">
+                   👥 Todos los estudiantes
+                </a>
+                <a th:href="@{/reportes/estudiantes(filtroPuntaje='alto')}" 
+                   th:classappend="${filtroActual == 'alto'} ? 'filtro-btn active' : 'filtro-btn'">
+                   🏆 Alto (>241)
+                </a>
+                <a th:href="@{/reportes/estudiantes(filtroPuntaje='medio-alto')}" 
+                   th:classappend="${filtroActual == 'medio-alto'} ? 'filtro-btn active' : 'filtro-btn'">
+                   👍 Medio-Alto (211-240)
+                </a>
+                <a th:href="@{/reportes/estudiantes(filtroPuntaje='medio-bajo')}" 
+                   th:classappend="${filtroActual == 'medio-bajo'} ? 'filtro-btn active' : 'filtro-btn'">
+                   💪 Medio-Bajo (180-210)
+                </a>
+                <a th:href="@{/reportes/estudiantes(filtroPuntaje='bajo')}" 
+                   th:classappend="${filtroActual == 'bajo'} ? 'filtro-btn active' : 'filtro-btn'">
+                   ⚠️ Bajo (<80)
+                </a>
+                <a th:href="@{/reportes/estudiantes(filtroPuntaje='sin-resultados')}" 
+                   th:classappend="${filtroActual == 'sin-resultados'} ? 'filtro-btn active' : 'filtro-btn'">
+                   📭 Sin resultados
+                </a>
+            </div>
+        </div>
+
+        <!-- Estadísticas -->
+        <div th:if="${estadisticas != null}">
+            <h3>📈 Estadísticas del Grupo</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" th:text="${totalEstudiantes}"></div>
+                    <div class="stat-label">Total Estudiantes</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" th:text="${estadisticas.totalConResultados}"></div>
+                    <div class="stat-label">Con Resultados</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" th:text="${estadisticas.promedio}"></div>
+                    <div class="stat-label">Promedio General</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" th:text="${estadisticas.mediana}"></div>
+                    <div class="stat-label">Mediana</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" th:text="${estadisticas.maximo}"></div>
+                    <div class="stat-label">Puntaje Máximo</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" th:text="${estadisticas.minimo}"></div>
+                    <div class="stat-label">Puntaje Mínimo</div>
+                </div>
+            </div>
+
+            <!-- Distribución por niveles -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                <div class="stat-card" style="border-left-color: #dc3545;">
+                    <div class="stat-number" th:text="${estadisticas.nivel1}"></div>
+                    <div class="stat-label">Nivel 1</div>
+                </div>
+                <div class="stat-card" style="border-left-color: #ffc107;">
+                    <div class="stat-number" th:text="${estadisticas.nivel2}"></div>
+                    <div class="stat-label">Nivel 2</div>
+                </div>
+                <div class="stat-card" style="border-left-color: #28a745;">
+                    <div class="stat-number" th:text="${estadisticas.nivel3}"></div>
+                    <div class="stat-label">Nivel 3</div>
+                </div>
+                <div class="stat-card" style="border-left-color: #007bff;">
+                    <div class="stat-number" th:text="${estadisticas.nivel4}"></div>
+                    <div class="stat-label">Nivel 4</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de estudiantes -->
+        <h3>👥 Listado de Estudiantes 
+            <span class="badge" th:text="${estudiantesConResultados.size() + '/' + totalEstudiantes}"></span>
+        </h3>
+
+        <div th:if="${estudiantesConResultados.empty}">
+            <div class="sin-datos">
+                <h3>No hay estudiantes que coincidan con el filtro</h3>
+                <p>Prueba con otro criterio de filtrado</p>
+            </div>
+        </div>
+
+        <table th:unless="${estudiantesConResultados.empty}">
+            <thead>
+                <tr>
+                    <th>Documento</th>
+                    <th>Nombre Completo</th>
+                    <th>Tipo Prueba</th>
+                    <th>Puntaje General</th>
+                    <th>Nivel</th>
+                    <th>Promedio Competencias</th>
+                    <th>Competencias Evaluadas</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="est : ${estudiantesConResultados}" 
+                    th:classappend="${est.puntajeGeneral != null and est.puntajeGeneral < 80} ? 'alerta-bajo' : ''">
+                    <td th:text="${est.estudiante.numeroDocumento}"></td>
+                    <td th:text="${est.estudiante.nombres + ' ' + est.estudiante.apellidos}"></td>
+                    <td th:text="${est.tipoPrueba}"></td>
+                    <td>
+                        <span th:if="${est.puntajeGeneral != null}" th:text="${est.puntajeGeneral}"></span>
+                        <span th:if="${est.puntajeGeneral == null}" style="color: #6c757d;">N/A</span>
+                    </td>
+                    <td>
+                        <span th:if="${est.nivel != 'Sin resultados'}" 
+                              th:classappend="${'nivel-indicator nivel-' + est.nivel}"
+                              th:text="${'Nivel ' + est.nivel}"></span>
+                        <span th:if="${est.nivel == 'Sin resultados'}" 
+                              class="nivel-indicator sin-resultados"
+                              th:text="${est.nivel}"></span>
+                    </td>
+                    <td th:text="${est.promedioCompetencias} + '/100'"></td>
+                    <td th:text="${est.totalCompetencias}"></td>
+                    <td>
+                        <span th:if="${est.puntajeGeneral != null and est.puntajeGeneral < 80}" 
+                              style="color: #dc3545; font-weight: bold;">⚠️ Necesita atención</span>
+                        <span th:if="${est.puntajeGeneral == null}" 
+                              style="color: #6c757d;">⏳ Sin resultados</span>
+                        <span th:if="${est.puntajeGeneral != null and est.puntajeGeneral >= 80}" 
+                              style="color: #28a745;">✅ Normal</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

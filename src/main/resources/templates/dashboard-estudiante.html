@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Estudiante - Sistema Saber Pro</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .welcome-text {
+            color: #333;
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 300;
+        }
+        .subtitle {
+            color: #666;
+            margin: 0.5rem 0 0 0;
+            font-size: 1.2rem;
+        }
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+        .card h3 {
+            color: #333;
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .info-item {
+            margin-bottom: 1rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .info-label {
+            font-weight: bold;
+            color: #555;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+        .info-value {
+            color: #333;
+            font-size: 1.1rem;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: bold;
+            margin-top: 0.5rem;
+        }
+        .status-available {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .nav-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+        .nav-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        .nav-card:hover {
+            border-color: #667eea;
+            transform: translateY(-3px);
+            text-decoration: none;
+            color: inherit;
+        }
+        .nav-card h4 {
+            margin: 0 0 0.5rem 0;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .nav-card p {
+            color: #666;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+        .logout-btn {
+            display: inline-block;
+            background: #dc3545;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            text-decoration: none;
+            margin-top: 1rem;
+            transition: background 0.3s ease;
+        }
+        .logout-btn:hover {
+            background: #c82333;
+            text-decoration: none;
+            color: white;
+        }
+        .icon {
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="welcome-text">¡Bienvenido/a, <span th:text="${estudiante.nombres}"></span>!</h1>
+            <p class="subtitle">Panel de control del estudiante</p>
+        </div>
+
+        <!-- Mensaje de error -->
+        <div th:if="${error}" style="background: #f8d7da; color: #721c24; padding: 1rem; border-radius: 8px; margin-bottom: 2rem;">
+            <span th:text="${error}"></span>
+        </div>
+
+        <div class="cards-container">
+            <!-- Información Personal -->
+            <div class="card">
+                <h3>👤 Información Personal</h3>
+                <div class="info-item">
+                    <span class="info-label">Nombres Completos</span>
+                    <div class="info-value" th:text="${estudiante.nombres + ' ' + estudiante.apellidos}"></div>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Documento</span>
+                    <div class="info-value" th:text="${estudiante.tipoDocumento + ': ' + estudiante.numeroDocumento}"></div>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Correo Electrónico</span>
+                    <div class="info-value" th:text="${estudiante.correo}"></div>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Teléfono</span>
+                    <div class="info-value" th:text="${estudiante.telefono}"></div>
+                </div>
+            </div>
+
+            <!-- Estado del Sistema -->
+            <div class="card">
+                <h3>📊 Estado Académico</h3>
+                <div class="info-item">
+                    <span class="info-label">Resultados de Pruebas</span>
+                    <div th:if="${estudiante.resultadosDisponibles}" class="status-badge status-available">
+                        ✅ Resultados Disponibles
+                    </div>
+                    <div th:unless="${estudiante.resultadosDisponibles}" class="status-badge status-pending">
+                        ⏳ Pendiente de Resultados
+                    </div>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Total de Competencias Evaluadas</span>
+                    <div class="info-value" th:text="${totalResultados} + ' competencias'"></div>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Estado en el Sistema</span>
+                    <div class="info-value" th:text="${estudiante.activo ? '✅ Activo' : '❌ Inactivo'}"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navegación Rápida -->
+        <div class="card">
+            <h3>🚀 Accesos Rápidos</h3>
+            <div class="nav-cards">
+                <a href="/estudiante/resultados" class="nav-card">
+                    <h4>📈 Mis Resultados</h4>
+                    <p>Consulta tus puntajes y niveles obtenidos en las pruebas Saber Pro/T&T</p>
+                </a>
+                <a href="/estudiante/estadisticas" class="nav-card">
+                    <h4>📊 Estadísticas</h4>
+                    <p>Compara tu desempeño con los promedios del grupo de manera anónima</p>
+                </a>
+                <a href="/estudiante/beneficios" class="nav-card">
+                    <h4>🎓 Beneficios</h4>
+                    <p>Revisa los beneficios académicos obtenidos según tu puntaje</p>
+                </a>
+                <div class="nav-card" style="background: #f8f9fa; cursor: not-allowed;">
+                    <h4>📚 Recursos</h4>
+                    <p>Material de estudio y preparación (próximamente)</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Logout -->
+        <div style="text-align: center; margin-top: 2rem;">
+            <a href="/logout" class="logout-btn">🚪 Cerrar Sesión</a>
+        </div>
+    </div>
+</body>
+</html>
