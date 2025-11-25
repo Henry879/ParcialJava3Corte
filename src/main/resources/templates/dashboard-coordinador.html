@@ -2,29 +2,303 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard Coordinador</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Coordinador - Sistema Saber Pro</title>
     <style>
-        body { font-family: Arial; margin: 20px; }
-        .header { background: #007bff; color: white; padding: 1rem; }
-        .menu { margin: 1rem 0; }
-        .menu a { margin-right: 1rem; text-decoration: none; color: #007bff; }
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .welcome-text {
+            color: #333;
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 300;
+        }
+        .subtitle {
+            color: #666;
+            margin: 0.5rem 0 0 0;
+            font-size: 1.2rem;
+        }
+        .user-info {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            display: inline-block;
+        }
+        .header-menu {
+            margin-top: 1.5rem;
+        }
+        .header-menu a {
+            margin: 0 0.75rem;
+            text-decoration: none;
+            color: white;
+            background: #007bff;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        .header-menu a:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+            text-decoration: none;
+            color: white;
+        }
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+        .card h3 {
+            color: #333;
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 2px solid #f8f9fa;
+            padding-bottom: 1rem;
+        }
+        .nav-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+        .nav-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            text-align: center;
+        }
+        .nav-card:hover {
+            border-color: #007bff;
+            transform: translateY(-3px);
+            text-decoration: none;
+            color: inherit;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        .nav-card h4 {
+            margin: 0 0 0.5rem 0;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .nav-card p {
+            color: #666;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+        .icon {
+            font-size: 1.5rem;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 0;
+            color: #007bff;
+        }
+        .stat-label {
+            color: #666;
+            margin: 0.5rem 0 0 0;
+            font-size: 0.9rem;
+        }
+        .quick-actions {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .action-btn {
+            background: #007bff;
+            color: white;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            text-align: center;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .action-btn:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+            text-decoration: none;
+            color: white;
+        }
+        .logout-section {
+            text-align: center;
+            margin-top: 2rem;
+        }
+        .logout-btn {
+            display: inline-block;
+            background: #dc3545;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            text-decoration: none;
+            transition: background 0.3s ease;
+        }
+        .logout-btn:hover {
+            background: #c82333;
+            text-decoration: none;
+            color: white;
+        }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>Dashboard Coordinador</h1>
-        <p>Bienvenido: <span th:text="${usuario.documento}"></span></p>
-        <a href="/logout" style="color: white;">Cerrar Sesión</a>
-		<a href="/reportes/estudiantes">📊 Reporte Estudiantes</a>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="welcome-text">Dashboard Coordinador</h1>
+            <p class="subtitle">Sistema de Gestión de Resultados Saber Pro</p>
+            
+            <div class="user-info">
+                👤 Bienvenido: <strong th:text="${usuario.documento}"></strong> | Rol: Coordinador
+            </div>
+            
+            <div class="header-menu">
+                <a href="/reportes/estudiantes">📊 Reporte Estudiantes</a>
+                <a href="/reportes/beneficios">🎓 Reporte Beneficios</a>
+                <a href="/reportes/competencias-completo">📈 Reporte Competencias</a>
+            </div>
+        </div>
+
+        <!-- Estadísticas Rápidas -->
+        <div class="card">
+            <h3>📊 Resumen del Sistema</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">23</div>
+                    <div class="stat-label">Estudiantes Activos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">8</div>
+                    <div class="stat-label">Competencias</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">184</div>
+                    <div class="stat-label">Resultados</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">21</div>
+                    <div class="stat-label">Con Beneficios</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navegación Principal -->
+        <div class="card">
+            <h3>🚀 Acciones Principales</h3>
+            <div class="nav-cards">
+                <a href="/resultados/nuevo" class="nav-card">
+                    <h4>➕ Ingresar Resultados</h4>
+                    <p>Registrar nuevos puntajes de pruebas Saber Pro/T&T</p>
+                </a>
+                <a href="/resultados" class="nav-card">
+                    <h4>📋 Ver Todos los Resultados</h4>
+                    <p>Consultar y revisar todos los resultados registrados</p>
+                </a>
+                <a href="/estudiantes/nuevo" class="nav-card">
+                    <h4>👤 Nuevo Estudiante</h4>
+                    <p>Registrar nuevo estudiante en el sistema</p>
+                </a>
+                <a href="/estudiantes" class="nav-card">
+                    <h4>👥 Gestionar Estudiantes</h4>
+                    <p>Administrar información de estudiantes</p>
+                </a>
+            </div>
+        </div>
+
+        <!-- Reportes Avanzados -->
+        <div class="card">
+            <h3>📈 Reportes Especializados</h3>
+            <div class="nav-cards">
+                <a href="/reportes/estudiantes" class="nav-card">
+                    <h4>👥 Reporte de Estudiantes</h4>
+                    <p>Listado completo con filtros por puntaje y niveles</p>
+                </a>
+                <a href="/reportes/beneficios" class="nav-card">
+                    <h4>🎓 Reporte de Beneficios</h4>
+                    <p>Estudiantes que califican para exoneraciones y becas</p>
+                </a>
+                <a href="/reportes/competencias-completo" class="nav-card">
+                    <h4>📊 Reporte por Competencias</h4>
+                    <p>Análisis detallado de las 8 competencias por estudiante</p>
+                </a>
+            </div>
+        </div>
+
+        <!-- Acciones Rápidas -->
+        <div class="quick-actions">
+            <h3>⚡ Acciones Rápidas</h3>
+            <div class="action-buttons">
+                <a href="/resultados/nuevo" class="action-btn">➕ Ingresar Resultado Rápido</a>
+                <a href="/reportes/beneficios?filtroRango=con-alerta" class="action-btn">🚨 Ver Alertas de Graduación</a>
+                <a href="/reportes/competencias-completo" class="action-btn">📈 Análisis de Competencias</a>
+                <a href="/reportes/estudiantes?filtroPuntaje=alto" class="action-btn">🏆 Mejores Puntajes</a>
+            </div>
+        </div>
+
+        <!-- Logout -->
+        <div class="logout-section">
+            <a href="/logout" class="logout-btn">🚪 Cerrar Sesión</a>
+        </div>
     </div>
-    
-    <div class="menu">
-        <a href="/estudiantes">Gestionar Estudiantes</a>
-        <a href="/estudiantes/nuevo">Nuevo Estudiante</a>
-		<a href="/resultados/nuevo">Ingresar Resultados</a>
-		<a href="/resultados">Ver Resultados</a>
-    </div>
-    
-    <p>Esta es la página del coordinador. Aquí podrás gestionar estudiantes.</p>
 </body>
 </html>

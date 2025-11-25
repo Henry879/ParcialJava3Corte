@@ -210,4 +210,69 @@ public class EstudianteDashboardController {
         else if (miPromedio >= 60) return "Top 75%";
         else return "Top 100%";
     }
+ // AGREGAR ESTE MÉTODO AL FINAL DE EstudianteDashboardController.java
+
+    @GetMapping("/estudiante/beneficios")
+    public String verMisBeneficios(HttpSession session, Model model) {
+        // Verificar que sea estudiante
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        if (usuario == null || !usuario.getRol().equals("ESTUDIANTE")) {
+            return "redirect:/login";
+        }
+
+        try {
+            // Buscar el estudiante por documento
+            Optional<Estudiante> estudianteOpt = estudianteRepository.findByNumeroDocumento(usuario.getDocumento());
+            
+            if (estudianteOpt.isEmpty()) {
+                model.addAttribute("error", "No se encontró información del estudiante");
+                return "estudiante/beneficios";
+            }
+
+            Estudiante estudiante = estudianteOpt.get();
+            
+            // Buscar todos los resultados del estudiante
+            List<Resultado> resultados = resultadoRepository.findByEstudianteId(estudiante.getId());
+            
+            if (resultados.isEmpty()) {
+                model.addAttribute("mensaje", "No hay resultados disponibles para mostrar beneficios");
+            } else {
+                // Obtener el primer resultado para datos generales
+                Resultado primerResultado = resultados.get(0);
+                
+                // Verificar si hay alerta de graduación en algún resultado
+                boolean tieneAlertaGraduacion = resultados.stream()
+                    .anyMatch(r -> r.getAlertaGraduacion() != null && r.getAlertaGraduacion());
+                
+                // Calcular estadísticas de beneficios
+                long totalConExoneracion = resultados.stream()
+                    .filter(r -> r.getExoneracionNota() != null && !"0".equals(r.getExoneracionNota()))
+                    .count();
+                    
+                long totalConBeca = resultados.stream()
+                    .filter(r -> r.getBecaPorcentaje() != null && !"0".equals(r.getBecaPorcentaje()))
+                    .count();
+                
+                model.addAttribute("resultados", resultados);
+                model.addAttribute("estudiante", estudiante);
+                model.addAttribute("puntajeGeneral", primerResultado.getPuntajeGeneral());
+                model.addAttribute("tipoPrueba", primerResultado.getTipoPrueba());
+                model.addAttribute("nivelGeneral", primerResultado.getNivel());
+                model.addAttribute("beneficiosGeneral", primerResultado.getBeneficios());
+                model.addAttribute("tieneAlertaGraduacion", tieneAlertaGraduacion);
+                model.addAttribute("totalConExoneracion", totalConExoneracion);
+                model.addAttribute("totalConBeca", totalConBeca);
+                model.addAttribute("exoneracionNota", primerResultado.getExoneracionNota());
+                model.addAttribute("becaPorcentaje", primerResultado.getBecaPorcentaje());
+            }
+            
+            return "estudiante/beneficios";
+            
+        } catch (Exception e) {
+            System.out.println("ERROR en verMisBeneficios: " + e.getMessage());
+            e.printStackTrace();
+            model.addAttribute("error", "Error al cargar los beneficios: " + e.getMessage());
+            return "estudiante/beneficios";
+        }
+    }
 }

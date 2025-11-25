@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Beneficios - Sistema Saber Pro</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .nav-menu {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .nav-menu a {
+            margin: 0 1rem;
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+        }
+        .resumen-beneficios {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .alerta-graduacion {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .beneficio-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+        .beneficio-card:hover {
+            border-color: #007bff;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .beneficio-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .beneficio-titulo {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+            margin: 0;
+        }
+        .nivel-indicator {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            color: white;
+            font-weight: bold;
+        }
+        .nivel-1 { background-color: #dc3545; }
+        .nivel-2 { background-color: #ffc107; color: black; }
+        .nivel-3 { background-color: #28a745; }
+        .nivel-4 { background-color: #007bff; }
+        .beneficio-detalle {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .detalle-item {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .detalle-valor {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #007bff;
+            margin: 0;
+        }
+        .detalle-label {
+            color: #666;
+            margin: 0.5rem 0 0 0;
+            font-size: 0.9rem;
+        }
+        .icono-beneficio {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navegación -->
+        <div class="nav-menu">
+            <a href="/dashboard-estudiante">🏠 Dashboard</a>
+            <a href="/estudiante/resultados">📊 Mis Resultados</a>
+            <a href="/estudiante/beneficios">🎓 Mis Beneficios</a>
+            <a href="/estudiante/estadisticas">📈 Estadísticas</a>
+            <a href="/logout">🚪 Cerrar Sesión</a>
+        </div>
+
+        <h1>🎓 Mis Beneficios Académicos</h1>
+
+        <!-- Mensajes de error -->
+        <div th:if="${error}" class="error-message" th:text="${error}"></div>
+
+        <!-- Alerta de graduación -->
+        <div th:if="${tieneAlertaGraduacion}" class="alerta-graduacion">
+            <h3>⚠️ ALERTA IMPORTANTE</h3>
+            <p>Tu puntaje indica riesgo de no graduación. Por favor contacta a coordinación académica.</p>
+        </div>
+
+        <!-- Sin resultados -->
+        <div th:if="${mensaje}" class="empty-state">
+            <h3>📭 Aún no hay resultados</h3>
+            <p th:text="${mensaje}"></p>
+        </div>
+
+        <!-- Con resultados -->
+        <div th:if="${resultados != null and !resultados.empty}">
+            <!-- Resumen General -->
+            <div class="resumen-beneficios">
+                <h2>Tu Resumen de Beneficios</h2>
+                <div style="font-size: 3rem; margin: 1rem 0;" th:text="${puntajeGeneral}"></div>
+                <div>Puntaje General <span th:text="${tipoPrueba}"></span></div>
+                <div class="nivel-indicator" th:classappend="${'nivel-' + nivelGeneral}" 
+                     th:text="${'Nivel ' + nivelGeneral}" style="margin-top: 1rem;"></div>
+                <p style="margin-top: 1rem; font-size: 1.1rem;" th:text="${beneficiosGeneral}"></p>
+            </div>
+
+            <!-- Detalles de Beneficios -->
+            <div class="beneficio-detalle">
+                <div class="detalle-item">
+                    <div class="icono-beneficio">📚</div>
+                    <div class="detalle-valor" th:text="${totalConExoneracion}"></div>
+                    <div class="detalle-label">Competencias con Exoneración</div>
+                </div>
+                <div class="detalle-item">
+                    <div class="icono-beneficio">💰</div>
+                    <div class="detalle-valor" th:text="${becaPorcentaje} + '%'"></div>
+                    <div class="detalle-label">Porcentaje de Beca</div>
+                </div>
+                <div class="detalle-item">
+                    <div class="icono-beneficio">⭐</div>
+                    <div class="detalle-valor" th:text="${exoneracionNota}"></div>
+                    <div class="detalle-label">Nota de Exoneración</div>
+                </div>
+                <div class="detalle-item">
+                    <div class="icono-beneficio">🎯</div>
+                    <div class="detalle-valor" th:text="${resultados.size()}"></div>
+                    <div class="detalle-label">Total Competencias</div>
+                </div>
+            </div>
+
+            <!-- Lista de Competencias con Beneficios -->
+            <h3 style="margin-top: 2rem;">📋 Beneficios por Competencia</h3>
+            <div th:each="resultado : ${resultados}">
+                <div class="beneficio-card">
+                    <div class="beneficio-header">
+                        <h4 class="beneficio-titulo" th:text="${resultado.competencia.nombre}"></h4>
+                        <span th:classappend="${'nivel-indicator nivel-' + resultado.nivel}" 
+                              th:text="${'Nivel ' + resultado.nivel}"></span>
+                    </div>
+                    
+                    <p><strong>Puntaje:</strong> <span th:text="${resultado.puntaje} + '/100'"></span></p>
+                    <p><strong>Beneficio:</strong> <span th:text="${resultado.beneficios}"></span></p>
+                    
+                    <div th:if="${resultado.alertaGraduacion}" style="color: #dc3545; font-weight: bold;">
+                        ⚠️ Alerta: Esta competencia requiere atención
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

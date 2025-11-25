@@ -7,51 +7,108 @@ import java.util.Map;
 @Service
 public class PuntajeService {
     
-    public Map<String, String> calcularNivelYBeneficios(String tipoPrueba, Double puntajeGeneral) {
-        Map<String, String> resultado = new HashMap<>();
+    public Map<String, Object> calcularBeneficiosSegunAcuerdo(String tipoPrueba, Double puntajeGeneral) {
+        Map<String, Object> resultado = new HashMap<>();
         
         if (puntajeGeneral == null) {
-            resultado.put("nivel", "1");
-            resultado.put("beneficios", "Sin beneficios - Puntaje no válido");
-            return resultado;
+            return crearResultadoError("Puntaje no válido");
         }
         
         if ("SABER_PRO".equals(tipoPrueba)) {
-            if (puntajeGeneral >= 241) {
-                resultado.put("nivel", "4");
-                resultado.put("beneficios", "Exoneración trabajo de grado con nota 5.0 + 100% beca derechos de grado");
-            } else if (puntajeGeneral >= 211) {
-                resultado.put("nivel", "3");
-                resultado.put("beneficios", "Exoneración trabajo de grado con nota 4.7 + 50% beca derechos de grado");
-            } else if (puntajeGeneral >= 180) {
-                resultado.put("nivel", "2");
-                resultado.put("beneficios", "Exoneración trabajo de grado con nota 4.5");
-            } else {
-                resultado.put("nivel", "1");
-                resultado.put("beneficios", "Sin beneficios");
-            }
+            return calcularBeneficiosSaberPro(puntajeGeneral);
         } else if ("SABER_TT".equals(tipoPrueba)) {
-            if (puntajeGeneral >= 171) {
-                resultado.put("nivel", "4");
-                resultado.put("beneficios", "Exoneración trabajo de grado con nota 5.0 + 100% beca derechos de grado");
-            } else if (puntajeGeneral >= 151) {
-                resultado.put("nivel", "3");
-                resultado.put("beneficios", "Exoneración trabajo de grado con nota 4.7 + 50% beca derechos de grado");
-            } else if (puntajeGeneral >= 120) {
-                resultado.put("nivel", "2");
-                resultado.put("beneficios", "Exoneración trabajo de grado con nota 4.5");
-            } else {
-                resultado.put("nivel", "1");
-                resultado.put("beneficios", "Sin beneficios");
-            }
+            return calcularBeneficiosSaberTT(puntajeGeneral);
         } else {
-            resultado.put("nivel", "1");
-            resultado.put("beneficios", "Sin beneficios - Tipo de prueba no válido");
+            return crearResultadoError("Tipo de prueba no válido");
+        }
+    }
+    
+    private Map<String, Object> calcularBeneficiosSaberPro(Double puntaje) {
+        Map<String, Object> beneficios = new HashMap<>();
+        
+        if (puntaje >= 241) {
+            beneficios.put("nivel", "4");
+            beneficios.put("beneficios", "Exoneración con nota 5.0 + 100% beca derechos de grado");
+            beneficios.put("exoneracion_nota", "5.0");
+            beneficios.put("beca_porcentaje", "100");
+            beneficios.put("alerta_graduacion", false);
+        } else if (puntaje >= 211) {
+            beneficios.put("nivel", "3");
+            beneficios.put("beneficios", "Exoneración con nota 4.7 + 50% beca derechos de grado");
+            beneficios.put("exoneracion_nota", "4.7");
+            beneficios.put("beca_porcentaje", "50");
+            beneficios.put("alerta_graduacion", false);
+        } else if (puntaje >= 180) {
+            beneficios.put("nivel", "2");
+            beneficios.put("beneficios", "Exoneración con nota 4.5");
+            beneficios.put("exoneracion_nota", "4.5");
+            beneficios.put("beca_porcentaje", "0");
+            beneficios.put("alerta_graduacion", false);
+        } else if (puntaje < 80) {
+            beneficios.put("nivel", "1");
+            beneficios.put("beneficios", "ALERTA: Riesgo de no graduación");
+            beneficios.put("exoneracion_nota", "0");
+            beneficios.put("beca_porcentaje", "0");
+            beneficios.put("alerta_graduacion", true);
+        } else {
+            beneficios.put("nivel", "1");
+            beneficios.put("beneficios", "Sin beneficios aplicables");
+            beneficios.put("exoneracion_nota", "0");
+            beneficios.put("beca_porcentaje", "0");
+            beneficios.put("alerta_graduacion", false);
         }
         
-        return resultado;
+        return beneficios;
     }
-
+    
+    private Map<String, Object> calcularBeneficiosSaberTT(Double puntaje) {
+        Map<String, Object> beneficios = new HashMap<>();
+        
+        if (puntaje >= 171) {
+            beneficios.put("nivel", "4");
+            beneficios.put("beneficios", "Exoneración con nota 5.0 + 100% beca derechos de grado");
+            beneficios.put("exoneracion_nota", "5.0");
+            beneficios.put("beca_porcentaje", "100");
+            beneficios.put("alerta_graduacion", false);
+        } else if (puntaje >= 151) {
+            beneficios.put("nivel", "3");
+            beneficios.put("beneficios", "Exoneración con nota 4.7 + 50% beca derechos de grado");
+            beneficios.put("exoneracion_nota", "4.7");
+            beneficios.put("beca_porcentaje", "50");
+            beneficios.put("alerta_graduacion", false);
+        } else if (puntaje >= 120) {
+            beneficios.put("nivel", "2");
+            beneficios.put("beneficios", "Exoneración con nota 4.5");
+            beneficios.put("exoneracion_nota", "4.5");
+            beneficios.put("beca_porcentaje", "0");
+            beneficios.put("alerta_graduacion", false);
+        } else if (puntaje < 80) {
+            beneficios.put("nivel", "1");
+            beneficios.put("beneficios", "ALERTA: Riesgo de no graduación");
+            beneficios.put("exoneracion_nota", "0");
+            beneficios.put("beca_porcentaje", "0");
+            beneficios.put("alerta_graduacion", true);
+        } else {
+            beneficios.put("nivel", "1");
+            beneficios.put("beneficios", "Sin beneficios aplicables");
+            beneficios.put("exoneracion_nota", "0");
+            beneficios.put("beca_porcentaje", "0");
+            beneficios.put("alerta_graduacion", false);
+        }
+        
+        return beneficios;
+    }
+    
+    private Map<String, Object> crearResultadoError(String mensaje) {
+        Map<String, Object> error = new HashMap<>();
+        error.put("nivel", "1");
+        error.put("beneficios", mensaje);
+        error.put("exoneracion_nota", "0");
+        error.put("beca_porcentaje", "0");
+        error.put("alerta_graduacion", false);
+        return error;
+    }
+    
     public boolean validarRangoPuntaje(String tipoPrueba, Double puntaje) {
         if (puntaje == null) return false;
         

@@ -91,6 +91,21 @@ public class DataLoader implements CommandLineRunner {
             comp5.setNombre("Comunicación Escrita");
             comp5.setDescripcion("Habilidad para producir textos escritos");
             competenciaRepository.save(comp5);
+            
+            Competencia comp6 = new Competencia();
+            comp6.setNombre("Formulación De Proyectos De Ingeniería");
+            comp6.setDescripcion("Habilidad para formular proyectos de ingeniería");
+            competenciaRepository.save(comp6);
+
+            Competencia comp7 = new Competencia();
+            comp7.setNombre("Pensamiento Científico - Matemáticas Y Estadística");
+            comp7.setDescripcion("Habilidades en matemáticas y estadística para el pensamiento científico");
+            competenciaRepository.save(comp7);
+
+            Competencia comp8 = new Competencia();
+            comp8.setNombre("Diseño De Software");
+            comp8.setDescripcion("Habilidades para el diseño y desarrollo de software");
+            competenciaRepository.save(comp8);
 
             System.out.println("✅ Competencias de ejemplo creadas");
         }
